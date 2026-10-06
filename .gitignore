@@ -1,0 +1,6 @@
+# Build output and fetched dependencies (build.sh / tools/setup.sh)
+/build/
+/.deps/
+# Deployment-specific provisioning (see provision/device.env.example)
+/provision/device.env
+/provision/ca.pem

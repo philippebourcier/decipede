@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>%BRAND_NAME% %BRAND_TAGLINE%</title>
+<link rel="icon" id="icon" href="data:,">
+<style>
+:root{--bg:#0a1016;--card:#101922;--card2:#0d151d;--line:#1d2b37;--text:#e3ecf2;--mute:#7f93a3;--dim:#4f6475;
+--teal:#00788c;--accent:#1fb5c9;--good:#22c55e;--warn:#eab308;--bad:#ef4444;--blue:#3b82f6;--orange:#f97316;--pink:#ec4899;--cyan:#22d3ee}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#0f2430 0,transparent 60%),var(--bg);color:var(--text);
+font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif;min-height:100vh}
+.wrap{max-width:1360px;margin:0 auto;padding:16px 16px 24px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;padding:12px 16px;background:var(--card2);border:1px solid var(--line);border-radius:14px}
+.brand{display:flex;align-items:center;gap:12px;flex:1 1 280px}
+.brand svg{width:44px;height:44px;border-radius:10px;flex:none}
+.brand h1{margin:0;font-size:18px;font-weight:650;letter-spacing:.2px}
+.brand small{display:block;color:var(--mute);font-size:12px;letter-spacing:.3px}
+.hstat{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--mute);padding-left:18px;border-left:1px solid var(--line)}
+.hstat b{color:var(--text);font-size:14px;font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--text);font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--dim);flex:none}
+.dot.on{background:var(--good);box-shadow:0 0 10px var(--good)}.dot.off{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+#clock{font:600 20px/1.1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--text)}
+button{font:inherit;color:var(--text);background:#14303a;border:1px solid var(--teal);border-radius:8px;padding:7px 14px;cursor:pointer}
+button:hover{background:#1a4250}button:disabled{opacity:.5;cursor:default}
+.icon-btn{padding:6px 10px;line-height:1}
+#banner{display:none;margin-top:12px;padding:10px 14px;border-radius:10px;background:#3a1416;border:1px solid #7f1d1d;color:#fecaca}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0}
+.card h2{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px}
+.card h2 svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kpi .v{font-size:24px;font-weight:650;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .s{color:var(--mute);font-size:12px;margin-top:4px;min-height:17px}
+.span2{grid-column:span 2}.span4{grid-column:1/-1}
+.rows{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
+.rows dt{color:var(--mute)}.rows dd{margin:0;text-align:right;overflow-wrap:anywhere}
+.ok{color:var(--good)}.wa{color:var(--warn)}.ko{color:var(--bad)}.mu{color:var(--mute)}
+.gauges{display:flex;justify-content:space-around;gap:8px;flex-wrap:wrap}
+.gauge{text-align:center}.gauge svg{width:120px;height:120px}
+.gauge .l{color:var(--mute);font-size:12px}
+.note{font-size:12px;margin-top:10px;padding:7px 10px;border-radius:8px;background:#2a2410;border:1px solid #4d4114;color:#fde68a;display:none}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.badge{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mute)}
+.badge.ok{border-color:#166534;color:#86efac;background:#0f2a1a}.badge.ko{border-color:#7f1d1d;color:#fca5a5;background:#2a1012}
+.leds{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.led{display:flex;gap:16px;align-items:center}
+.led>i{width:44px;height:44px;border-radius:50%;flex:none;background:#333}
+.led .st{font-size:20px;font-weight:650;line-height:1.2}.led .m{color:var(--text);font-size:13px;margin-top:2px}
+.legend2{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+.legend2 span{display:inline-flex;align-items:center;gap:6px}.legend2 span.cur{color:var(--text)}
+.legend2 i{width:9px;height:9px;border-radius:50%;flex:none}
+.blink{animation:bl 1s step-start infinite}@keyframes bl{50%{opacity:.15}}
+.env{display:flex;justify-content:space-around;align-items:flex-end;gap:6px;flex-wrap:wrap}
+.env figure{margin:0;text-align:center}.env figcaption{color:var(--mute);font-size:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{padding:4px 10px;font-size:12px;background:transparent;border-color:var(--line);color:var(--mute)}
+.tabs button.sel{border-color:var(--accent);color:var(--text);background:#123039}
+.chead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+#hist{width:100%;height:240px;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-top:4px}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+svg text{font-family:inherit}
+#sky{width:100%;max-width:260px;display:block;margin:0 auto}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;color:var(--dim);font-size:12px;margin-top:14px;padding:0 4px}
+footer a{color:var(--mute)}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.leds{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.kpi .v{font-size:20px}.grid{grid-template-columns:1fr}.span2{grid-column:auto}.hstat{border:0;padding:0}.wrap{padding:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><!--LOGO--><div><h1>%BRAND_NAME%</h1><small>%BRAND_TAGLINE%</small></div></div>
+  <div class="hstat"><span class="pill"><i class="dot" id="ntripDot"></i><span id="ntripTxt">NTRIP …</span></span><span id="ntripSub">-</span></div>
+  <div class="hstat"><b>Firmware v<span id="fw">%VERSION%</span></b><span id="hw">-</span></div>
+  <div class="hstat"><span id="clock">--:--:--</span><span id="date">UTC</span></div>
+  <button class="icon-btn" id="refresh" title="Refresh now">&#x21bb;</button>
+</header>
+<div id="banner"></div>
+
+<section class="leds">
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24"><path d="M5 12.5a7 7 0 0 1 14 0M8.5 15.5a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/></svg>LED1 &middot; Internet / NTRIP</h2>
+    <div class="led"><i id="led1"></i><div><div class="st" id="led1s">-</div><div class="m" id="led1m">-</div></div></div>
+    <div class="legend2" id="led1l"></div>
+  </div>
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 0 1 16 0M12 10v11M8 21h8"/><circle cx="12" cy="10" r="2"/></svg>LED2 &middot; GNSS / Antenna</h2>
+    <div class="led"><i id="led2"></i><div><div class="st" id="led2s">-</div><div class="m" id="led2m">-</div></div></div>
+    <div class="legend2" id="led2l"></div>
+  </div>
+</section>
+
+<section class="kpis">
+  <div class="card kpi"><h2>Satellites</h2><div class="v" id="satN">-</div><div class="s" id="satSys"></div></div>
+  <div class="card kpi"><h2>Signal quality</h2><div class="v" id="cn0">-</div><div class="s" id="cn0Sub"></div></div>
+  <div class="card kpi"><h2>Uptime</h2><div class="v" id="uptime">-</div><div class="s" id="uptimeSub"></div></div>
+  <div class="card kpi"><h2>RTCM output</h2><div class="v" id="rate">-</div><div class="s" id="rtcmSub"></div></div>
+  <div class="card kpi"><h2>Caster</h2><div class="v" id="mount">-</div><div class="s" id="casterSub"></div></div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20M2 12h20"/></svg>Sky plot</h2>
+    <svg id="sky" viewBox="0 0 240 240"></svg>
+    <div class="legend" id="skyLegend"></div>
+  </div>
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24"><path d="M4 20V14M10 20V8M16 20V11M22 20V4"/></svg>AGC (lower is better)</h2>
+    <svg id="agc" viewBox="0 0 300 190" width="100%"></svg>
+    <div class="note" id="agcNote"></div>
+  </div>
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>Level</h2>
+    <svg id="level" viewBox="0 0 200 200" width="100%" style="max-height:190px"></svg>
+    <dl class="rows"><dt>Pitch / roll</dt><dd id="pr">-</dd><dt>&Delta; pitch / roll (5 min)</dt><dd id="prd">-</dd><dt>RMS max &Delta;</dt><dd id="rms">-</dd></dl>
+    <div class="badges" id="levelBadges"></div>
+  </div>
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg>Environment</h2>
+    <div class="env" id="env"></div>
+  </div>
+
+  <div class="card span4">
+    <div class="chead">
+      <h2 style="margin:0"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-5 4 3 5-7"/></svg>History</h2>
+      <div class="tabs" id="tabs"></div>
+      <div class="tabs" id="ranges"></div>
+    </div>
+    <svg id="hist" preserveAspectRatio="none"></svg>
+    <div class="legend" id="histLegend"></div>
+  </div>
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>CPU</h2>
+    <div class="gauges"><div class="gauge" id="g0"></div><div class="gauge" id="g1"></div></div>
+    <dl class="rows" style="margin-top:10px"><dt>Clock</dt><dd id="mhz">-</dd><dt>MCU temperature</dt><dd id="mcuT">-</dd><dt>Stack free</dt><dd id="stack">-</dd></dl>
+  </div>
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Timing</h2>
+    <dl class="rows">
+      <dt>UTC</dt><dd id="utc">-</dd>
+      <dt>PPS</dt><dd id="pps">-</dd>
+      <dt>PPS period</dt><dd id="ppsPer">-</dd>
+      <dt>Deviation (last min)</dt><dd id="ppsDev">-</dd>
+      <dt>PPS edges</dt><dd id="ppsCnt">-</dd>
+      <dt>RTK_STAT</dt><dd id="rtk">-</dd>
+      <dt>NTP server</dt><dd id="ntp">-</dd>
+    </dl>
+  </div>
+  <div class="card span2">
+    <h2><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>System</h2>
+    <dl class="rows">
+      <dt>UM980</dt><dd id="um980">-</dd>
+      <dt>UM980 FW update</dt><dd id="gnssFw">-</dd>
+      <dt>GNSS watchdog</dt><dd id="wdog">-</dd>
+      <dt>Network</dt><dd id="net">-</dd>
+      <dt>Config</dt><dd id="cfg">-</dd>
+      <dt>Partition</dt><dd id="part">-</dd>
+      <dt>OTA</dt><dd id="ota">-</dd>
+    </dl>
+    <div style="margin-top:12px;display:none" id="otaBox"><button id="otaBtn">Check for new firmware</button></div>
+  </div>
+
+</section>
+<footer><span>%BRAND_NAME% &middot; RP2350 + UM980 base &middot; <a href="/basic">basic page</a> &middot; <a href="/status.json">status.json</a></span><span id="updated">-</span></footer>
+</div>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const POLL_MS = 10000, KEEP_MS = 36e5;
+const LEDC = {GREEN:"#22c55e",YELLOW:"#eab308",RED:"#ef4444",BLUE:"#3b82f6",ORANGE:"#f97316",CYAN:"#22d3ee",PINK:"#ec4899",RED_BLINK:"#ef4444",OFF:"#333"};
+// LED colours and meanings, as in led_meta[] in src/http_server.c.
+const LEGEND = {
+  led1: [["ORANGE", "Booting / NTRIP reconnecting"], ["CYAN", "Ethernet up, downloading config"], ["GREEN", "Config downloaded, NTRIP connected"],
+    ["YELLOW", "Remote config failed (using local)"], ["RED", "Ethernet init failed / NTRIP reconnect failed"]],
+  led2: [["ORANGE", "Booting"], ["YELLOW", "UM980 initializing"], ["CYAN", "UM980 up, checks pending"], ["GREEN", "AGC good, level, no vibration"],
+    ["BLUE", "AGC degraded"], ["PINK", "Vibrating or tilted"], ["RED", "UM980 init failed / AGC error"], ["RED_BLINK", "No PPS (no satellite lock)"]],
+};
+const SYS = [["GPS","#3b82f6"],["GLO","#f87171"],["SBAS","#94a3b8"],["GAL","#a78bfa"],["BDS","#f59e0b"],["QZSS","#22d3ee"],["IRNSS","#ec4899"]];
+let S = null, fetchedAt = 0, liveRate = null, hist = [], histKey = null, tab = "rtcm", range = 36e5;
+
+function el(tag, attrs, parent, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const set = (id, v, cls) => { const e = $(id); e.textContent = v; if (cls !== undefined) e.className = cls; };
+const fmt = v => Number.isInteger(v) ? String(v) : v.toFixed(1);
+const num = (v, d, u) => v == null ? "-" : v.toFixed(d) + (u || "");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function dur(s) {
+  const d = Math.floor(s / 86400), h = Math.floor(s / 3600) % 24, m = Math.floor(s / 60) % 60, x = Math.floor(s % 60);
+  return d ? `${d}d ${h}h ${m}m` : h ? `${h}h ${m}m ${x}s` : `${m}m ${x}s`;
+}
+function bytes(n) {
+  return n >= 1e9 ? (n / 1e9).toFixed(2) + " GB" : n >= 1e6 ? (n / 1e6).toFixed(1) + " MB" : n >= 1e3 ? (n / 1e3).toFixed(1) + " kB" : n + " B";
+}
+
+// --- Widgets -------------------------------------------------------------------
+
+function ring(id, pct, label, sub) {
+  const box = $(id); box.textContent = "";
+  const s = el("svg", {viewBox: "0 0 120 120"}, box);
+  const c = 2 * Math.PI * 50, p = Math.max(0, Math.min(100, pct || 0));
+  const col = p > 85 ? "var(--bad)" : p > 60 ? "var(--warn)" : "var(--accent)";
+  el("circle", {cx: 60, cy: 60, r: 50, fill: "none", stroke: "#1d2b37", "stroke-width": 10}, s);
+  el("circle", {cx: 60, cy: 60, r: 50, fill: "none", stroke: col, "stroke-width": 10, "stroke-linecap": "round",
+    "stroke-dasharray": `${c * p / 100} ${c}`, transform: "rotate(-90 60 60)", style: `filter:drop-shadow(0 0 4px ${col})`}, s);
+  el("text", {x: 60, y: 58, "text-anchor": "middle", fill: "#e3ecf2", "font-size": 22, "font-weight": 650}, s, pct == null ? "-" : pct.toFixed(1) + "%");
+  el("text", {x: 60, y: 78, "text-anchor": "middle", fill: "#7f93a3", "font-size": 11}, s, sub);
+  const l = document.createElement("div"); l.className = "l"; l.textContent = label; box.appendChild(l);
+}
+
+function agcBars() {
+  const s = $("agc"); s.textContent = "";
+  const v = [S.agc_l1, S.agc_l2, S.agc_l5], st = S.agc_state || [], names = ["L1", "L2", "L5"], f = ["1575.42", "1227.60", "1176.45"];
+  const max = Math.max(60, ...v.filter(x => x != null).map(x => Math.ceil(x / 10) * 10));
+  const y = val => 160 - val / max * 140;
+  for (let g = 0; g <= max; g += max / 4) {
+    el("line", {x1: 34, x2: 296, y1: y(g), y2: y(g), stroke: "#1d2b37"}, s);
+    el("text", {x: 28, y: y(g) + 4, "text-anchor": "end", fill: "#4f6475", "font-size": 10}, s, g);
+  }
+  el("line", {x1: 34, x2: 296, y1: y(10), y2: y(10), stroke: "#22c55e", "stroke-dasharray": "4 3", opacity: .7}, s);
+  el("text", {x: 296, y: y(10) - 4, "text-anchor": "end", fill: "#22c55e", "font-size": 9}, s, "good < 10");
+  const bad = [];
+  v.forEach((val, i) => {
+    const x = 58 + i * 82, col = st[i] === "good" ? "#22c55e" : st[i] === "bad" ? "#eab308" : "#4f6475";
+    if (val != null) {
+      const h = Math.max(2, 160 - y(val));
+      el("rect", {x, y: 160 - h, width: 46, height: h, rx: 5, fill: col, opacity: .85, style: `filter:drop-shadow(0 0 6px ${col})`}, s);
+    }
+    el("text", {x: x + 23, y: val == null ? 150 : y(val) - 6, "text-anchor": "middle", fill: col, "font-size": 13, "font-weight": 650}, s, val == null ? "n/a" : val.toFixed(0));
+    el("text", {x: x + 23, y: 176, "text-anchor": "middle", fill: "#e3ecf2", "font-size": 12, "font-weight": 600}, s, names[i]);
+    el("text", {x: x + 23, y: 188, "text-anchor": "middle", fill: "#4f6475", "font-size": 9}, s, f[i] + " MHz");
+    if (st[i] === "bad") bad.push(names[i]);
+  });
+  const n = $("agcNote");
+  n.style.display = bad.length ? "block" : "none";
+  n.textContent = bad.length ? `⚠ ${bad.join(", ")} AGC high: interference or poor sky view` : "";
+}
+
+function levelPlot() {
+  const s = $("level"); s.textContent = "";
+  const R = 85, full = 5;
+  [5, 2, 1].forEach(d => {
+    el("circle", {cx: 100, cy: 100, r: R * d / full, fill: d === 2 ? "#0f2a1a" : "none", stroke: d === 2 ? "#166534" : "#1d2b37"}, s);
+    el("text", {x: 100 + R * d / full * .71 + 2, y: 100 - R * d / full * .71 - 2, fill: "#4f6475", "font-size": 9}, s, d + "°");
+  });
+  el("line", {x1: 10, x2: 190, y1: 100, y2: 100, stroke: "#1d2b37"}, s);
+  el("line", {y1: 10, y2: 190, x1: 100, x2: 100, stroke: "#1d2b37"}, s);
+  if (S.pitch == null || S.roll == null) return;
+  const cl = v => Math.max(-full, Math.min(full, v));
+  const x = 100 + cl(S.roll) / full * R, yy = 100 - cl(S.pitch) / full * R;
+  const col = S.level === false || S.vibrating ? "#ef4444" : "#22c55e";
+  el("circle", {cx: x, cy: yy, r: 11, fill: col, opacity: .25}, s);
+  el("circle", {cx: x, cy: yy, r: 6, fill: col, style: `filter:drop-shadow(0 0 6px ${col})`}, s);
+}
+
+// Both chips (RP2350, UM980) are rated -40..+85 degC ambient: -10..+90 scale,
+// orange from 70, red from 80, marker at the 85 degC rating.
+function thermo(parent, t, label) {
+  const f = document.createElement("figure"); parent.appendChild(f);
+  const s = el("svg", {viewBox: "0 0 84 150", width: 84, height: 150}, f);
+  const lo = -10, hi = 90, top = 14, bot = 112, Y = v => bot - (v - lo) / (hi - lo) * (bot - top);
+  const v = t == null ? lo : Math.max(lo, Math.min(hi, t));
+  const col = t == null ? "#4f6475" : t >= 80 ? "#ef4444" : t >= 70 ? "#f97316" : "#1fb5c9";
+  el("rect", {x: 20, y: 8, width: 14, height: 112, rx: 7, fill: "#0d151d", stroke: "#1d2b37"}, s);
+  el("rect", {x: 21, y: Y(80), width: 12, height: Y(70) - Y(80), fill: "#f97316", opacity: .25}, s);
+  el("rect", {x: 21, y: Y(90), width: 12, height: Y(80) - Y(90), fill: "#ef4444", opacity: .3}, s);
+  el("rect", {x: 23, y: Y(v), width: 8, height: bot - Y(v) + 6, rx: 4, fill: col}, s);
+  el("circle", {cx: 27, cy: 128, r: 12, fill: col, stroke: "#1d2b37", style: `filter:drop-shadow(0 0 5px ${col})`}, s);
+  for (let g = 0; g <= 80; g += 20) {
+    el("line", {x1: 37, x2: 41, y1: Y(g), y2: Y(g), stroke: "#4f6475"}, s);
+    if (g < 80) el("text", {x: 44, y: Y(g) + 3, fill: "#4f6475", "font-size": 9}, s, g);  // 80: room for "85 max"
+  }
+  el("line", {x1: 14, x2: 41, y1: Y(85), y2: Y(85), stroke: "#ef4444", "stroke-width": 1.5}, s);
+  el("text", {x: 44, y: Y(85) + 1, fill: "#ef4444", "font-size": 9, "font-weight": 600}, s, "85 max");
+  const c = document.createElement("figcaption");
+  c.innerHTML = `<b style="font-size:20px;color:${t != null && t >= 70 ? col : "#e3ecf2"}">${t == null ? "-" : t.toFixed(1) + " °C"}</b><br>${label}`;
+  f.appendChild(c);
+}
+
+function humidity(parent, h) {
+  const f = document.createElement("figure"); parent.appendChild(f);
+  const s = el("svg", {viewBox: "0 0 110 110", width: 110, height: 110}, f);
+  const c = 2 * Math.PI * 42, p = h == null ? 0 : Math.max(0, Math.min(100, h));
+  el("circle", {cx: 55, cy: 55, r: 42, fill: "none", stroke: "#1d2b37", "stroke-width": 9}, s);
+  el("circle", {cx: 55, cy: 55, r: 42, fill: "none", stroke: "#3b82f6", "stroke-width": 9, "stroke-linecap": "round",
+    "stroke-dasharray": `${c * p / 100} ${c}`, transform: "rotate(-90 55 55)"}, s);
+  el("path", {d: "M55 36c-6 8-10 13-10 18a10 10 0 0 0 20 0c0-5-4-10-10-18z", fill: "#3b82f6", opacity: .8}, s);
+  el("text", {x: 55, y: 84, "text-anchor": "middle", fill: "#e3ecf2", "font-size": 15, "font-weight": 650}, s, h == null ? "-" : h.toFixed(0) + "%");
+  const cap = document.createElement("figcaption"); cap.textContent = "Humidity"; f.appendChild(cap);
+}
+
+function skyPlot() {
+  const s = $("sky"); s.textContent = "";
+  const C = 120, R = 100;
+  [0, 30, 60].forEach(e => {
+    el("circle", {cx: C, cy: C, r: R * (90 - e) / 90, fill: e ? "none" : "#0d151d", stroke: "#1d2b37"}, s);
+    if (e) el("text", {x: C + 3, y: C - R * (90 - e) / 90 + 11, fill: "#4f6475", "font-size": 9}, s, e + "°");
+  });
+  el("line", {x1: C - R, x2: C + R, y1: C, y2: C, stroke: "#1d2b37"}, s);
+  el("line", {y1: C - R, y2: C + R, x1: C, x2: C, stroke: "#1d2b37"}, s);
+  [["N", C, C - R - 6], ["S", C, C + R + 14], ["E", C + R + 9, C + 4], ["W", C - R - 9, C + 4]].forEach(([t, x, y]) =>
+    el("text", {x, y, "text-anchor": "middle", fill: "#7f93a3", "font-size": 11, "font-weight": 600}, s, t));
+  const counts = {};
+  (S.sky || []).forEach(([sys, prn, az, elev, cn0]) => {
+    const r = R * (90 - elev) / 90, a = az * Math.PI / 180, [name, col] = SYS[sys] || ["?", "#888"];
+    counts[name] = (counts[name] || 0) + 1;
+    const g = el("g", {}, s);
+    el("circle", {cx: C + r * Math.sin(a), cy: C - r * Math.cos(a), r: 4 + Math.max(0, Math.min(4, (cn0 - 25) / 6)),
+      fill: col, opacity: Math.max(.35, Math.min(1, (cn0 - 15) / 30)), stroke: "#0a1016"}, g);
+    el("title", {}, g, `${name} ${prn} · el ${elev}° az ${az}° · ${cn0} dB-Hz`);
+  });
+  $("skyLegend").innerHTML = SYS.filter(([n]) => counts[n]).map(([n, c]) => `<span><i style="background:${c};height:8px;width:8px;border-radius:50%"></i>${n} ${counts[n]}</span>`).join("")
+    || '<span>No satellites</span>';
+}
+
+// --- History ---------------------------------------------------------------------
+// One sample per poll (10 s), 1 h kept: 360 samples, ~28 KB of localStorage.
+// Sample: [t, cpu0, cpu1, agc1, agc2, agc5, temp, mcuTemp, hum, ntripBytes, rtcmFrames, ppsPeriod, sats, uptime, avgCn0]
+
+const TABS = {
+  rtcm: {label: "RTCM", unit: "B/s", series: () => [["Throughput", "#1fb5c9", rateSeries()]]},
+  agc: {label: "AGC", unit: "", ref: [10, "good < 10"], series: () => [["L1", "#22c55e", col(3)], ["L2", "#3b82f6", col(4)], ["L5", "#a78bfa", col(5)]]},
+  cpu: {label: "CPU", unit: "%", series: () => [["Core 0", "#1fb5c9", col(1)], ["Core 1", "#22c55e", col(2)]]},
+  temp: {label: "Temperature", unit: "°C", series: () => [["Board (SHT40)", "#f97316", col(6)], ["MCU", "#ec4899", col(7)]]},
+  hum: {label: "Humidity", unit: "%", series: () => [["Humidity", "#3b82f6", col(8)]]},
+  pps: {label: "PPS", unit: "µs", series: () => [["Period − 1 s", "#eab308", hist.map(p => [p[0], p[11] == null ? null : p[11] - 1e6])]]},
+  sats: {label: "Satellites", unit: "", series: () => [["Tracked", "#a78bfa", col(12)]]},
+  cn0: {label: "C/N0", unit: "dB-Hz", ref: [40, "good ≥ 40"], series: () => [["Average C/N0", "#22d3ee", col(14)]]},
+};
+const RANGES = [["10 min", 6e5], ["30 min", 18e5], ["1 h", 36e5]];
+const col = i => hist.map(p => [p[0], p[i]]);
+function avgCn0(st) {
+  const cn = (st.sky || []).map(x => x[4]).filter(v => v > 0);
+  return cn.length ? cn.reduce((a, v) => a + v, 0) / cn.length : null;
+}
+function rateSeries() {
+  const out = [];
+  for (let i = 1; i < hist.length; i++) {
+    const a = hist[i - 1], b = hist[i], dt = (b[0] - a[0]) / 1000;
+    // A reboot (uptime went down) or a gap resets the counters: no rate.
+    out.push([b[0], b[13] < a[13] || dt > 600 || b[9] < a[9] ? null : (b[9] - a[9]) / dt]);
+  }
+  return out;
+}
+
+function loadHist() {
+  try { hist = JSON.parse(localStorage.getItem(histKey) || "[]"); } catch (e) { hist = []; }
+  if (!Array.isArray(hist)) hist = [];
+}
+function saveHist() {
+  try { localStorage.setItem(histKey, JSON.stringify(hist)); } catch (e) { /* storage full or blocked */ }
+}
+function record() {
+  const now = Date.now(), last = hist[hist.length - 1];
+  if (last && now - last[0] < 8000) return;  // reloads don't add near-duplicate samples
+  const n = v => v == null ? null : Math.round(v * 10) / 10;
+  hist.push([now, n(S.cpu && S.cpu[0]), n(S.cpu && S.cpu[1]), n(S.agc_l1), n(S.agc_l2), n(S.agc_l5), n(S.temperature),
+    n(S.mcu_temp), n(S.humidity), S.ntrip_bytes, S.rtcm_frames, S.pps ? S.pps_period_us : null, S.sats ? S.sats.total : null, S.uptime, n(avgCn0(S))]);
+  while (hist.length && hist[0][0] < now - KEEP_MS) hist.shift();
+  saveHist();
+}
+
+function chart() {
+  const s = $("hist"), W = s.clientWidth || 800, H = 240, L = 48, Rm = 12, T = 10, B = 26;
+  s.setAttribute("viewBox", `0 0 ${W} ${H}`); s.textContent = "";
+  const t1 = Date.now(), t0 = t1 - range, def = TABS[tab];
+  const series = def.series().map(([name, color, pts]) => ({name, color, pts: pts.filter(p => p[0] >= t0)}));
+  const vals = series.flatMap(x => x.pts.map(p => p[1]).filter(v => v != null));
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (!vals.length) { lo = 0; hi = 1; }
+  if (tab === "cpu" || tab === "hum") { lo = 0; hi = Math.max(hi, tab === "cpu" ? 25 : 100); }
+  if (hi - lo < 1e-9) { lo -= 1; hi += 1; }
+  const pad = (hi - lo) * .1; lo -= tab === "cpu" || tab === "hum" || tab === "rtcm" ? 0 : pad; hi += pad;
+  if (tab === "rtcm" || tab === "sats" || tab === "agc") lo = Math.max(0, lo);
+  const X = t => L + (t - t0) / range * (W - L - Rm), Y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+  for (let i = 0; i <= 4; i++) {
+    const v = lo + (hi - lo) * i / 4, y = Y(v);
+    el("line", {x1: L, x2: W - Rm, y1: y, y2: y, stroke: "#1d2b37"}, s);
+    el("text", {x: L - 6, y: y + 4, "text-anchor": "end", fill: "#4f6475", "font-size": 10}, s,
+      Math.abs(hi - lo) >= 20 ? v.toFixed(0) : v.toFixed(1));
+  }
+  const step = range / (W < 500 ? 3 : 6);
+  for (let t = t1; t >= t0 - 1; t -= step) {
+    const d = new Date(t);
+    el("text", {x: X(t), y: H - 8, "text-anchor": t === t1 ? "end" : "middle", fill: "#4f6475", "font-size": 10}, s,
+      d.toTimeString().slice(0, range <= 6e5 ? 8 : 5));
+  }
+  if (def.ref && def.ref[0] >= lo && def.ref[0] <= hi) {
+    el("line", {x1: L, x2: W - Rm, y1: Y(def.ref[0]), y2: Y(def.ref[0]), stroke: "#22c55e", "stroke-dasharray": "4 3", opacity: .7}, s);
+    el("text", {x: W - Rm, y: Y(def.ref[0]) - 4, "text-anchor": "end", fill: "#22c55e", "font-size": 10}, s, def.ref[1]);
+  }
+  series.forEach(({color, pts}) => {
+    let d = "", pen = false, prev = null;
+    pts.forEach(([t, v]) => {
+      if (v == null || (prev != null && t - prev > 300000)) { pen = false; }
+      if (v != null) { d += `${pen ? "L" : "M"}${X(t).toFixed(1)} ${Y(v).toFixed(1)}`; pen = true; }
+      prev = t;
+    });
+    if (d) el("path", {d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round", style: `filter:drop-shadow(0 0 3px ${color})`}, s);
+  });
+  if (!vals.length) ["Collecting data: one sample every 10 s,", "kept in this browser for 1 h"].forEach((t, i) =>
+    el("text", {x: W / 2, y: H / 2 - 8 + i * 18, "text-anchor": "middle", fill: "#4f6475", "font-size": 13}, s, t));
+  $("histLegend").innerHTML = series.map(x => {
+    const last = [...x.pts].reverse().find(p => p[1] != null);
+    return `<span><i style="background:${x.color}"></i>${esc(x.name)}${last ? ": " + (tab === "rtcm" ? last[1].toFixed(0) : fmt(last[1])) + " " + def.unit : ""}</span>`;
+  }).join("");
+  // Hover readout
+  const cross = el("line", {y1: T, y2: H - B, stroke: "#7f93a3", "stroke-dasharray": "3 3", visibility: "hidden"}, s);
+  const tip = el("text", {y: T + 12, fill: "#e3ecf2", "font-size": 11, visibility: "hidden"}, s);
+  s.onmousemove = ev => {
+    const r = s.getBoundingClientRect(), x = (ev.clientX - r.left) * W / r.width, t = t0 + (x - L) / (W - L - Rm) * range;
+    let best = null;
+    series.forEach(sr => sr.pts.forEach(p => { if (p[1] != null && (!best || Math.abs(p[0] - t) < Math.abs(best - t))) best = p[0]; }));
+    if (best == null || x < L) { cross.setAttribute("visibility", "hidden"); tip.setAttribute("visibility", "hidden"); return; }
+    const vs = series.map(sr => { const p = sr.pts.find(q => q[0] === best); return p && p[1] != null ? `${sr.name} ${tab === "rtcm" ? p[1].toFixed(0) : fmt(p[1])}` : null; }).filter(Boolean);
+    const bx = X(best), d = new Date(best);
+    cross.setAttribute("x1", bx); cross.setAttribute("x2", bx); cross.setAttribute("visibility", "visible");
+    tip.textContent = `${d.toLocaleTimeString()}  ${vs.join("  ")} ${def.unit}`;
+    tip.setAttribute("x", bx > W / 2 ? bx - 8 : bx + 8); tip.setAttribute("text-anchor", bx > W / 2 ? "end" : "start");
+    tip.setAttribute("visibility", "visible");
+  };
+  s.onmouseleave = () => { cross.setAttribute("visibility", "hidden"); tip.setAttribute("visibility", "hidden"); };
+}
+
+function tabsInit() {
+  const mk = (box, items, cur, onSel) => {
+    $(box).innerHTML = "";
+    items.forEach(([key, label]) => {
+      const b = document.createElement("button"); b.textContent = label; b.className = key === cur() ? "sel" : "";
+      b.onclick = () => { onSel(key); tabsInit(); chart(); };
+      $(box).appendChild(b);
+    });
+  };
+  mk("tabs", Object.entries(TABS).map(([k, v]) => [k, v.label]), () => tab, k => tab = k);
+  mk("ranges", RANGES.map(([l, v]) => [v, l]), () => range, v => range = v);
+}
+
+// --- Render ------------------------------------------------------------------------
+
+function render() {
+  const s = S;
+  $("ntripDot").className = "dot " + (s.ntrip ? "on" : "off");
+  set("ntripTxt", s.ntrip ? "NTRIP connected" : "NTRIP disconnected");
+  set("ntripSub", s.mountpoint ? "/" + s.mountpoint : "-");
+  set("fw", s.fw);
+  set("hw", "Hardware ID " + s.hw);
+
+  set("satN", s.sats ? s.sats.total : "-");
+  $("satSys").innerHTML = s.sats ? SYS.filter(([n]) => s.sats[n]).map(([n, c]) => `<span style="color:${c}">${n}</span> ${s.sats[n]}`).join(" &nbsp;") : "no data";
+  // Average C/N0 of the tracked satellites: antenna / sky health at a glance.
+  const cn = (s.sky || []).map(x => x[4]).filter(v => v > 0), avg = avgCn0(s);
+  set("cn0", avg == null ? "-" : `${avg.toFixed(1)} dB-Hz`, "v " + (avg == null ? "" : avg >= 40 ? "ok" : avg >= 32 ? "wa" : "ko"));
+  set("cn0Sub", cn.length ? `avg C/N0 · best ${Math.max(...cn)} · ${cn.filter(v => v >= 35).length}/${cn.length} sats ≥ 35` : "no satellites");
+  set("rate", liveRate == null ? (s.ntrip ? "…" : "-") : `${(liveRate / 1000).toFixed(2)} kB/s`);
+  set("rtcmSub", `${s.rtcm_frames.toLocaleString()} frames · ${s.rtcm_crc_errors} CRC err · ${s.rtcm_overruns} overruns`);
+  set("mount", s.mountpoint || "-");
+  set("casterSub", `${s.ntrip_server || "-"} · ${bytes(s.ntrip_bytes)} sent`);
+
+  ring("g0", s.cpu && s.cpu[0], "Core 0 · main", `peak ${s.cpu_peak ? s.cpu_peak[0].toFixed(0) : "-"}%`);
+  ring("g1", s.cpu && s.cpu[1], "Core 1 · NTRIP", `peak ${s.cpu_peak ? s.cpu_peak[1].toFixed(0) : "-"}%`);
+  set("mhz", s.mcu_mhz ? `${s.mcu_mhz} MHz, 2 cores` : "-");
+  set("mcuT", num(s.mcu_temp, 1, " °C"));
+  set("stack", s.stack_free == null ? "-" : `${(s.stack_free / 1024).toFixed(1)} KB`);
+
+  agcBars();
+  levelPlot();
+  set("pr", s.pitch == null ? "-" : `${s.pitch.toFixed(2)}° / ${s.roll.toFixed(2)}°`);
+  set("prd", `${num(s.pitch_delta, 3, "°")} / ${num(s.roll_delta, 3, "°")}`);
+  set("rms", num(s.rms_max_delta, 3, " dps"));
+  $("levelBadges").innerHTML = (s.level == null ? '<span class="badge">Level: n/a</span>' : s.level ? '<span class="badge ok">Level</span>' : '<span class="badge ko">Tilted</span>') +
+    (s.vibrating ? '<span class="badge ko">Vibrating</span>' : '<span class="badge ok">No vibration</span>');
+
+  const env = $("env"); env.textContent = "";
+  thermo(env, s.temperature, "Board (SHT40)");
+  thermo(env, s.mcu_temp, "MCU (RP2350)");
+  humidity(env, s.humidity);
+
+  skyPlot();
+  set("pps", s.pps ? "present" : "absent (no lock?)", s.pps ? "ok" : "ko");
+  set("ppsPer", s.pps ? `${s.pps_period_us.toLocaleString()} µs` : "-");
+  set("ppsDev", s.pps_dev_us ? `${s.pps_dev_us[0]} … ${s.pps_dev_us[1]} µs` : "-");
+  set("ppsCnt", s.pps_count.toLocaleString());
+  set("rtk", s.rtk_stat ? "1 (RTK fixed)" : "0");
+  set("ntp", s.ntp_server ? `on · ${s.ntp_requests} req · ${s.ntp_dropped} dropped` : "off");
+
+  ["led1", "led2"].forEach(k => {
+    const c = s[k], col = LEDC[c] || "#333";
+    $(k).style.cssText = `background:${col};box-shadow:0 0 22px 6px ${col}`;
+    $(k).className = c === "RED_BLINK" ? "blink" : "";
+    set(k + "s", c === "RED_BLINK" ? "Red, blinking" : c.charAt(0) + c.slice(1).toLowerCase());
+    $(k + "s").style.color = col;
+    set(k + "m", s[k + "_meaning"]);
+    $(k + "l").innerHTML = LEGEND[k].map(([lc, m]) =>
+      `<span class="${lc === c ? "cur" : ""}"><i class="${lc === "RED_BLINK" ? "blink" : ""}" style="background:${LEDC[lc]}"></i>${esc(m)}</span>`).join("");
+  });
+
+  set("um980", `${s.um980_model || "UM980"} · ${s.um980_fw || "-"}`);
+  set("gnssFw", s.gnss_fw || "-");
+  set("wdog", `${s.gnss_watchdog}${s.gnss_resets ? ` · ${s.gnss_resets} resets` : ""}`, /OK/i.test(s.gnss_watchdog) ? "ok" : "");
+  set("net", `${s.net_mode} · ${s.ip} · MSS ${s.tcp_mss}`);
+  set("cfg", s.config_source, /fail/i.test(s.config_source) ? "wa" : "");
+  set("part", s.partition === 0 ? "A" : s.partition === 1 ? "B" : "-");
+  set("ota", s.ota || "-");
+  $("otaBox").style.display = s.ota_enabled ? "block" : "none";
+  chart();
+}
+
+// Live ticking between polls: uptime and the UTC clock.
+function tick() {
+  if (!S) return;
+  const dt = (performance.now() - fetchedAt) / 1000;
+  set("uptime", dur(S.uptime + dt));
+  set("uptimeSub", `since ${new Date(Date.now() - (S.uptime + dt) * 1000).toLocaleString()}`);
+  if (S.utc) {
+    const u = new Date(Date.parse(S.utc) + dt * 1000), iso = u.toISOString();
+    set("clock", iso.slice(11, 19));
+    set("date", iso.slice(0, 10) + " UTC (GNSS)");
+    set("utc", iso.slice(0, 19).replace("T", " "));
+  } else {
+    set("clock", "--:--:--"); set("date", "UTC not available (no PPS)"); set("utc", "not available");
+  }
+  set("updated", `Updated ${Math.round(dt)} s ago · refresh every 10 s`);
+}
+
+// The W5500 has no listen backlog: while both HTTP sockets are busy (other
+// browsers), a connection is refused rather than queued. Retry quickly.
+async function getJSON(url, signal) {
+  for (let i = 0; ; i++) {
+    try { return await fetch(url, {cache: "no-store", signal}); } catch (e) {
+      if (i >= 4 || e.name === "AbortError") throw e;
+      await new Promise(r => setTimeout(r, 200 + Math.random() * 400 * (i + 1)));
+    }
+  }
+}
+
+let timer = null;
+async function poll() {
+  clearTimeout(timer);
+  const ac = new AbortController(), to = setTimeout(() => ac.abort(), 10000);
+  try {
+    const r = await getJSON("/status.json", ac.signal);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const now = performance.now(), next = await r.json();
+    // Live RTCM rate from consecutive polls (counters reset when the base reboots).
+    if (S && next.uptime >= S.uptime && next.ntrip_bytes >= S.ntrip_bytes && now > fetchedAt)
+      liveRate = (next.ntrip_bytes - S.ntrip_bytes) / ((now - fetchedAt) / 1000);
+    S = next;
+    fetchedAt = now;
+    if (!histKey) { histKey = "crtk:" + S.hw; loadHist(); }
+    record();
+    $("banner").style.display = "none";
+    render();
+    tick();
+  } catch (e) {
+    const b = $("banner");
+    b.style.display = "block";
+    b.textContent = `Base unreachable (${e.name === "AbortError" ? "timeout" : e.message})` + (S ? ` · showing data from ${new Date(Date.now() - (performance.now() - fetchedAt)).toLocaleTimeString()}` : "");
+  } finally {
+    clearTimeout(to);
+    timer = setTimeout(poll, POLL_MS);
+  }
+}
+
+// Favicon from the inline logo (no second copy in the page, no favicon.ico request).
+$("icon").href = "data:image/svg+xml," + encodeURIComponent(document.querySelector(".brand svg").outerHTML);
+$("refresh").onclick = poll;
+$("otaBtn").onclick = async () => {
+  const b = $("otaBtn");
+  b.disabled = true; b.textContent = "Checking…";
+  for (let i = 0; i < 5; i++) {
+    try { await fetch("/ota/check?js=1", {method: "POST"}); break; } catch (e) { await new Promise(r => setTimeout(r, 300 + Math.random() * 500)); }
+  }
+  setTimeout(() => { b.disabled = false; b.textContent = "Check for new firmware"; poll(); }, 4000);
+};
+window.addEventListener("resize", () => S && chart());
+tabsInit();
+setInterval(tick, 1000);
+poll();
+</script>
+</body>
+</html>
