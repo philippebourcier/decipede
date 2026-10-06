@@ -110,13 +110,23 @@ config.json keys for the rest:
 
 ## Flash layout
 
-| Region   | Offset    | Size    | Content                                   |
-|----------|-----------|---------|-------------------------------------------|
-| PT       | 0x000000  | 8 KB    | partition table                           |
-| App A    | 0x002000  | 2040 KB | application slot                          |
-| App B    | 0x200000  | 2048 KB | application slot (linked to A)            |
-| Config   | 0x400000  | 64 KB   | config JSON + OTA state (2 × 2 sectors, power-cut safe) |
-| (free)   | 0x410000  | ~12 MB  | unused                                    |
+16 MB flash:
+
+| Region | Offset | Size | Content |
+|---|---|---|---|
+| PT | 0x000000 | 8 KB | partition table (`partitions.json`) |
+| App A | 0x002000 | 2040 KB | application slot |
+| App B | 0x200000 | 2048 KB | application slot (linked to A) |
+| Config | 0x400000 | 64 KB | four records of 2 sectors each, power-cut safe: config JSON, OTA state, UM980 staging record, GNSS watchdog reset budget (32 KB used) |
+| (free) | 0x410000 | ~3.9 MB | unused |
+| UM980 staging | 0x800000 | 4 MB | downloaded UM980 firmware package (`GNSS_STAGE_OFFSET` in `src/flash_store.h`) |
+| (free) | 0xC00000 | 4 MB | unused |
+
+- **App A, App B and Config** are bootrom partitions.
+- **The UM980 staging area** is plain unpartitioned flash, which
+  `partitions.json` makes readable and writable. So it needed no
+  partition-table change. An RP2350 OTA only ever writes the inactive
+  application slot, so it can't touch a staged UM980 package.
 
 ## First install (replaces MicroPython)
 
