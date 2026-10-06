@@ -6,10 +6,13 @@ sequence, LED codes, status page, telemetry and config server protocol as the
 MicroPython version, and adds **A/B over-the-air updates with automatic
 rollback** using the RP2350 bootrom.
 
+**Hardware:** wiring, GPIO map and parts list in [HARDWARE.md](HARDWARE.md).
+
 ## Layout
 
 ```
 build.sh        one-step build (fetches dependencies on first run)
+HARDWARE.md     parts, wiring and GPIO map
 src/            firmware sources (one module per Python file, plus ota.c, flash_store.c, http_*.c)
 boards/         board header (W5500-EVB-Pico2, 16 MiB flash)
 partitions.json flash partition table (App A / App B / Config)
