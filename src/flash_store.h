@@ -18,7 +18,12 @@
 #define FLASH_PAGE   256u
 
 // Config partition (see partitions.json).
-#define CONFIG_PART_OFFSET (4096u * 1024u)
+// The Config partition's start, read from partitions.json by CMake (single
+// source of truth: the partition table and this code can't disagree).
+#ifndef CONFIG_PART_START_KB
+#error "CONFIG_PART_START_KB must come from partitions.json (see CMakeLists.txt)"
+#endif
+#define CONFIG_PART_OFFSET (CONFIG_PART_START_KB * 1024u)
 #define CONFIG_PART_SIZE   (64u * 1024u)
 
 bool flash_erase_sector(uint32_t offset);

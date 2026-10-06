@@ -13,7 +13,7 @@
       "name": "App A",
       "id": 0,
       "start": "8K",
-      "size": "2040K",
+      "size": "3064K",
       "families": ["rp2350-arm-s"],
       "permissions": {
         "secure": "rw",
@@ -24,8 +24,8 @@
     {
       "name": "App B",
       "id": 1,
-      "start": "2048K",
-      "size": "2048K",
+      "start": "3072K",
+      "size": "3072K",
       "families": ["rp2350-arm-s"],
       "permissions": {
         "secure": "rw",
@@ -37,7 +37,7 @@
     {
       "name": "Config",
       "id": 2,
-      "start": "4096K",
+      "start": "6144K",
       "size": "64K",
       "families": ["data"],
       "permissions": {

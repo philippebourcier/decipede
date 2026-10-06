@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.19)
 
 set(PICO_BOARD w5500_evb_pico2)
 set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/boards)
@@ -48,6 +48,28 @@ math(EXPR FW_IMAGE_MINOR "${FW_VERSION_MINOR} * 256 + ${FW_VERSION_PATCH}")
 # provision/device.env holds this deployment's CONFIG_URL (see Provisioning in README).
 # ---------------------------------------------------------------------------
 set(PROVISION_FILE ${CMAKE_CURRENT_LIST_DIR}/provision/device.env CACHE FILEPATH "Provisioning env file")
+# Flash layout: the Config partition's start comes from partitions.json, so
+# the firmware's config storage always matches the partition table.
+file(READ ${CMAKE_CURRENT_LIST_DIR}/partitions.json PARTITIONS_JSON)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CMAKE_CURRENT_LIST_DIR}/partitions.json)
+string(JSON _nparts LENGTH "${PARTITIONS_JSON}" partitions)
+math(EXPR _last "${_nparts} - 1")
+set(CONFIG_PART_START_KB "")
+foreach(_i RANGE ${_last})
+    string(JSON _name GET "${PARTITIONS_JSON}" partitions ${_i} name)
+    if (_name STREQUAL "Config")
+        string(JSON _start GET "${PARTITIONS_JSON}" partitions ${_i} start)
+        if (NOT _start MATCHES "^([0-9]+)K$")
+            message(FATAL_ERROR "partitions.json: Config start must be given in K, got '${_start}'")
+        endif()
+        set(CONFIG_PART_START_KB ${CMAKE_MATCH_1})
+    endif()
+endforeach()
+if (NOT CONFIG_PART_START_KB)
+    message(FATAL_ERROR "partitions.json: no partition named Config")
+endif()
+message(STATUS "Config partition at ${CONFIG_PART_START_KB}K")
+
 # Network / branding provisioning, two files with the same KEY=value format:
 #   provision/defaults.env  tracked: the project's defaults (a fork edits this)
 #   provision/device.env    git-ignored: this deployment's values (override)
@@ -220,6 +242,7 @@ target_include_directories(rtkbase PRIVATE
 target_compile_definitions(rtkbase PRIVATE
     PICO_CORE1_STACK_SIZE=0x1000
     FW_VERSION_STRING=\"${FW_VERSION}\"
+    CONFIG_PART_START_KB=${CONFIG_PART_START_KB}u
     FW_VERSION_MAJOR=${FW_VERSION_MAJOR}
     FW_VERSION_MINOR=${FW_VERSION_MINOR}
     FW_VERSION_PATCH=${FW_VERSION_PATCH}
