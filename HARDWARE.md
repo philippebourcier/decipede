@@ -18,6 +18,7 @@ pins it doesn't break out.
 | 2 × RGB LED, **common anode** | LED1 (Internet/NTRIP), LED2 (GNSS/antenna) | Plus one series resistor per colour (6 in total). |
 | Push button + 10 kΩ resistor | BTN_USER (hold > 3 s: reboot) | Active high, with an external pull-down. |
 | 3.3 V regulator for the UM980 | | See "Power". |
+| WIZnet WIZPoE-P1 | Power over Ethernet | Optional, see "Power over Ethernet". |
 
 The firmware runs without the IMU or the SHT40: their status-page fields stay
 empty and the IMU alarm is disabled.
@@ -146,6 +147,43 @@ GP14, GP15, GP22.
   would exceed it.
 - Most UM980 breakouts already include a regulator: power them from 5 V.
 - **Connect the grounds** of the EVB and the UM980.
+
+### Power over Ethernet (optional)
+
+The W5500-EVB-Pico2 can be powered over its Ethernet cable with WIZnet's
+**WIZPoE-P1** module. One cable then carries both data and power, which is
+handy for a station on a mast or a roof. From the WIZPoE-P1 datasheet
+(v1.0.1):
+
+| | |
+|---|---|
+| Standard | IEEE 802.3af, mode A (endspan) and mode B (midspan), up to 100 m |
+| Input | 41–61 V DC from the PoE switch or injector; isolated |
+| Output | 5 V (4.75–5.25 V), 0.3–1.5 A; 9 W nominal |
+| Minimum load | 150–250 mA |
+| Ripple | 100 mV typical, 200 mV max |
+| Operating temperature | **−25 °C to +45 °C** |
+| Size | 38 × 16 × 13 mm |
+
+- **Power budget:** the whole station needs roughly 0.35–0.45 A at 5 V. That
+  is an estimate: EVB plus UM980 plus antenna LNA, with the UM980's
+  regulator losses. It's well within the module's 1.5 A and above its
+  minimum load, so no dummy load is needed.
+- **Wiring:**
+  - The module's 5 V output feeds the EVB like any external 5 V supply.
+  - The UM980's regulator takes its input from the same 5 V rail.
+  - Mount and connect the module as WIZnet documents for the W5500-EVB-Pico2.
+    Its inputs go to the RJ45 transformer centre taps (pairs 1/2 and 3/6)
+    and to the spare pairs (4/5 and 7/8).
+- **With USB connected too** (e.g. for the first flash): don't let the PoE
+  5 V and USB VBUS drive each other. Feed the external 5 V into VSYS through
+  a Schottky diode, as the Raspberry Pi Pico 2 datasheet recommends for
+  external supplies.
+- **Temperature limit:** at −25 °C to +45 °C, the PoE module is the most
+  temperature-limited part of the station; the UM980 is rated −40 °C to
+  +85 °C. In a sun-exposed enclosure, shade and ventilate it, or use an
+  industrial-temperature PoE splitter instead. The dashboard's board
+  temperature (SHT40) shows what the enclosure actually reaches.
 
 ## Using a stock W5500-EVB-Pico2
 
