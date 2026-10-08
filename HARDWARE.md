@@ -11,7 +11,7 @@ pins it doesn't break out.
 | Part | Role | Notes |
 |---|---|---|
 | WIZnet W5500-EVB-Pico2 | MCU (RP2350A) + Ethernet (W5500) | Needs the 16 MB flash version: the firmware uses A/B slots plus a 4 MB UM980 firmware staging area at 8 MB. |
-| Unicore UM980 module or breakout | Triple-band RTK GNSS receiver | Needs COM1, COM2, PPS, RTK_STAT and RESET_N; EVENT is optional. |
+| Unicore UM980 module or breakout | Triple-band RTK GNSS receiver | Needs COM1, COM2, PPS, RTK_STAT and RESET_N; EVENT is optional. Reference board: ArduSimple simpleRTK3B Micro UM980 (see below). |
 | Triple-band GNSS antenna (L1/L2/L5) | | Fed by the UM980's antenna bias (VCC_RF), as on the usual breakouts. |
 | LSM6DSV16X breakout | IMU: vibration and tilt alarm | Optional. I2C address **0x6B** (SA0 high). |
 | SHT40 breakout | Board temperature and humidity | Optional. I2C address **0x44** (SHT40-AD1B). |
@@ -103,6 +103,53 @@ GP14, GP15, GP22.
   may be left unconnected.
 - The receiver's saved configuration doesn't matter: the firmware sets the
   ports, messages and base mode it needs at every boot.
+
+### ArduSimple simpleRTK3B Micro UM980
+
+The reference station uses the **AS-RTK3B-MICRO-UM980-SMATH-00** (UM980,
+SMA antenna connector). It includes all the RF components, so it is wired
+straight to the EVB:
+
+| EVB | Signal | simpleRTK3B Micro pin |
+|---|---|---|
+| GP0 (UART0 TX) | COM1 in | 3 (RX1) |
+| GP1 (UART0 RX) | COM1 out | 2 (TX1) |
+| GP2 | PPS | 13 (TPS) |
+| GP3 | RTK_STAT | 18 (RTKSTAT) |
+| GP4 | Reset | 5 (RESET) |
+| GP5 | Event (unused) | 19 (EXTINT), optional |
+| GP8 (UART1 TX) | COM2 in | 16 (RX2) |
+| GP9 (UART1 RX) | COM2 out | 12 (TX2) |
+| 3.3 V regulator | Power, 200 mA max | 1 (VCC) |
+| GND | Ground | 10 and 11 (both) |
+
+- **Leave unconnected:**
+  - V_USB, USB+ and USB− (pins 6–8): the board's own USB port;
+  - V_BCKP (pin 14): the backup supply for a faster warm start;
+  - the N/C pins.
+- **Pin 5 (RESET)** is marked "leave open for always ON". The firmware only
+  pulls it low to reset the receiver, so connecting it to GP4 is safe.
+
+### Other receivers
+
+Only the **UM980** is supported. The firmware speaks Unicore's command set.
+
+- **UM981 / UM982** (the same ArduSimple board with another Unicore module):
+  not tested. Firmware updates only accept UM980 packages.
+- **Septentrio mosaic-X5** (AS-RTK3B-MICRO-MX-L125SMASTD-00): **not
+  supported.** The board has the same 20-pin footprint and pinout as the
+  UM980 board, but:
+  - **Power:** it draws up to 400 mA, not 200 mA.
+  - **Pin 18** is GPLED, a configurable LED output, instead of RTKSTAT.
+  - **Commands:** the module uses Septentrio's command set and binary SBF
+    output. The configuration, time, satellite and AGC queries would all
+    need a new receiver driver.
+  - **Firmware updates:** the module's firmware is updated through
+    Septentrio's own tools, so remote receiver updates wouldn't be
+    available.
+
+  On decipede it would stay in "UM980 init failed" (solid red LED2).
+  Supporting it is possible, but needs a board to develop and test on.
 
 ## I2C sensors
 
