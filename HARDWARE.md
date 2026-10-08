@@ -124,8 +124,8 @@ GP14, GP15, GP22.
 - Size the resistors for **≤ 4 mA per colour**, the RP2350 pads' default
   drive strength. That's about 330 Ω to 1 kΩ, depending on the LED and the
   brightness you want.
-- LED colours and their meanings are listed in the README ("LED2" section)
-  and shown on the status page.
+- LED colours and their meanings are listed in the README
+  ([LEDs](README.md#leds)) and shown on the status page.
 
 ## Button
 
@@ -225,6 +225,6 @@ channel is A for even and B for odd GPIOs.
 
 ## Flashing
 
-See the README ("First install"). The board must be put in BOOTSEL mode once
+See the README ([Flash](README.md#2-flash)). The board must be put in BOOTSEL mode once
 to install the partition table and the first firmware. Later updates are
 over the network.
