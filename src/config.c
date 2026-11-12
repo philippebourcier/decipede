@@ -44,6 +44,7 @@ static const field_t fields[] = {
     FD(base_alt, true),
     FI(signal_group, true),
     FB(sbas_enabled, true),
+    FB(gps_l2p_enabled, true),
     FI(rtcm_interval, true),
     FS(ntrip_server, false, true),
     FI(ntrip_port, true),
@@ -72,6 +73,7 @@ void config_set_defaults(void) {
     config.base_pdop = 1;
     config.signal_group = 2;
     config.sbas_enabled = true;
+    config.gps_l2p_enabled = true;
     config.rtcm_interval = 1;
     // Caster, telemetry, OTA and UM980 firmware URLs: from config.json only.
     config.ntrip_port = 2101;  // NTRIP's standard port, if config.json gives none

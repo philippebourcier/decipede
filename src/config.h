@@ -26,6 +26,7 @@ typedef struct {
     double base_alt;
     int signal_group;
     bool sbas_enabled;
+    bool gps_l2p_enabled;  // false: GPS L2P(Y) masked, GPS L2 is L2C only
     int rtcm_interval;
     // NTRIP
     char ntrip_server[CFG_STR];
