@@ -114,6 +114,22 @@ long um980_build_number(const char *version) {
     return strtol(p + 5, NULL, 10);
 }
 
+// --- UM980 MASK query --------------------------------------------------------------
+
+bool mask_lists(const char *buf, const char *what) {
+    static const char tag[] = "$CONFIG,MASK,MASK ";
+    size_t n = strlen(what);
+    if (!n) return false;
+    for (const char *p = buf; (p = strstr(p, tag)) != NULL;) {
+        p += sizeof(tag) - 1;
+        while (*p == ' ') p++;
+        size_t i = 0;
+        while (i < n && toupper((unsigned char)p[i]) == toupper((unsigned char)what[i])) i++;
+        if (i == n && (p[n] == '*' || p[n] == '\r' || p[n] == '\n' || p[n] == ' ' || p[n] == '\0')) return true;
+    }
+    return false;
+}
+
 // --- GNSS watchdog ---------------------------------------------------------------
 
 wdog_action_t wdog_step(wdog_state_t *st, const wdog_inputs_t *in, bool *persist_changed) {

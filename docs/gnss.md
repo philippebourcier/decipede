@@ -16,6 +16,9 @@ It checks and, when needed, sets:
 - **Signal group** (`signal_group`, default 2) and **SBAS**
   (`sbas_enabled`). Changing the signal group needs a receiver reboot, which
   is skipped when the value is already right.
+- **GPS L2P(Y)** (`gps_l2p_enabled`, default `true`): `false` sends
+  `MASK L2P`, `true` sends `UNMASK L2P` if the mask is set.
+  See [GPS L2 code](#gps-l2-code).
 - **PPS:** `CONFIG PPS ENABLE GPS POSITIVE 500000 1000 0 0`.
 - **The RTCM 3 messages on COM2:**
 
@@ -40,6 +43,31 @@ It checks and, when needed, sets:
 - It feeds the satellite counts, the sky plot and the signal-quality figure
   on the dashboard.
 - The query is skipped while the UM980 is being flashed.
+
+## GPS L2 code
+
+By default the UM980 tracks two codes on GPS L2 and both go into message
+1077: L2P(Y) (RINEX `2W`) on every satellite, and L2C on the satellites that
+transmit it.
+
+**Why turn L2P(Y) off:**
+- The UM980's L2P(Y) pseudorange carries an offset of the order of a metre.
+  It differs from unit to unit and moves over days. Being common to all
+  satellites, it cancels as long as one code is used on GPS L2.
+- It stops cancelling when software mixes the two codes, L2P(Y) for some
+  satellites and L2C for the others. Decoders that keep one code per band
+  take L2P(Y) first when it is present (RTKLIB's code priority), so a UM980
+  is read on `2W` and a UM982, which has no L2P(Y), on L2C.
+- With `gps_l2p_enabled: false` the stream carries the same GPS signals as a
+  UM982's, and no mix is possible downstream.
+
+**Cost:** the GPS satellites without L2C (the remaining block IIR) lose
+their L2 observations.
+
+**Compatibility:** the key defaults to `true`, so a station whose
+`config.json` doesn't carry it behaves as before. The mask is stored by
+`SAVECONFIG` and is checked at every boot (`MASK` query), so going back to
+`true` restores L2P(Y).
 
 ## Auxiliary signals
 

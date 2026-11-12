@@ -231,6 +231,7 @@ can still be reached (see [docs/https.md](docs/https.md)).
 | `base_duration`, `base_pdop` | `60`, `1` | Self-survey duration (s) and PDOP limit. |
 | `signal_group` | `2` | UM980 `CONFIG SIGNALGROUP` value. |
 | `sbas_enabled` | `true` | SBAS tracking. |
+| `gps_l2p_enabled` | `true` | GPS L2P(Y) tracking. `false` masks it (`MASK L2P`): GPS L2 is then L2C only, as on a UM982. See [docs/gnss.md](docs/gnss.md). |
 | `rtcm_interval` | `1` | Interval of the MSM7 observation messages (s). |
 | `dhcp` | `true` | `false` uses `ip`, `subnet`, `gateway`, `dns` (dotted quads). DHCP takes over if the static settings can't reach the Internet. |
 | `tcp_mss` | `0` | TCP MSS; 0 is automatic. Pin it for a known link, e.g. `1360` behind a VPN. |

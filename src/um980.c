@@ -6,6 +6,7 @@
 
 #include "board.h"
 #include "config.h"
+#include "gnss_logic.h"
 #include "hardware/dma.h"
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
@@ -359,6 +360,7 @@ typedef struct {
     int sbas;           // -1 unknown, 0 disabled, 1 enabled
     char mode[64];
     int pps;  // -1 unknown, 0 disabled, 1 enabled
+    int l2p_masked;  // -1 unknown, 0 tracked, 1 masked
     bool rtcm_on_com2[16];
 } um980_state_t;
 
@@ -368,6 +370,7 @@ static void get_current_config(um980_state_t *st) {
     st->signal_group = -1;
     st->sbas = -1;
     st->pps = -1;
+    st->l2p_masked = -1;
 
     char *cur, *line;
     if (send_query("CONFIG", 5000)) {
@@ -403,6 +406,13 @@ static void get_current_config(um980_state_t *st) {
                 printf("✓ %s\n", line + 8);
             }
         }
+    }
+
+    // "$CONFIG,MASK,MASK L2P*xx" when GPS L2P(Y) tracking is masked. The
+    // answer always carries at least the elevation mask.
+    if (send_query("MASK", 3000) && strstr(resp, "MASK")) {
+        st->l2p_masked = mask_lists(resp, "L2P") ? 1 : 0;
+        printf("✓ GPS L2P(Y): %s\n", st->l2p_masked ? "Masked" : "Tracked");
     }
 
     if (send_query("MODE", 5000)) {
@@ -456,6 +466,12 @@ static bool config_needs_update(const um980_state_t *st) {
         printf("✗ PPS disabled (should be enabled)\n");
         needs = true;
     }
+    // Unknown counts as tracked, the receiver's default.
+    if ((st->l2p_masked == 1) == config.gps_l2p_enabled) {
+        printf("✗ GPS L2P(Y) %s (should be %s)\n", st->l2p_masked == 1 ? "masked" : "tracked",
+               config.gps_l2p_enabled ? "tracked" : "masked");
+        needs = true;
+    }
     if (st->mode[0] && !str_icase_find(st->mode, "BASE")) {
         printf("✗ Not in base mode: %s\n", st->mode);
         needs = true;
@@ -502,6 +518,13 @@ static void configure(const um980_state_t *st) {
     printf("%s SBAS...\n", config.sbas_enabled ? "Enabling" : "Disabling");
     send_command(config.sbas_enabled ? "CONFIG SBAS ENABLE AUTO" : "CONFIG SBAS DISABLE", 2000);
     idle_sleep_ms(500);
+
+    // GPS L2P(Y) masked: the receiver tracks, and so encodes, L2C only on GPS L2.
+    if ((st->l2p_masked == 1) == config.gps_l2p_enabled) {
+        printf("%s GPS L2P(Y)...\n", config.gps_l2p_enabled ? "Unmasking" : "Masking");
+        send_command(config.gps_l2p_enabled ? "UNMASK L2P" : "MASK L2P", 2000);
+        idle_sleep_ms(500);
+    }
 
     if (strcmp(config.base_mode, "fixed") == 0) {
         if (config.base_lat < -90 || config.base_lat > 90 || config.base_lon < -180 || config.base_lon > 180 ||

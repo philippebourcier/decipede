@@ -42,6 +42,13 @@ bool um980_pkg_header_ok(const uint8_t *hdr, size_t len, const char *product);
 // (returns -1 if absent).
 long um980_build_number(const char *version);
 
+// --- UM980 MASK query --------------------------------------------------------------
+
+// True if the answer to a "MASK" query lists `what` as masked, e.g.
+// mask_lists(buf, "L2P") for a "$CONFIG,MASK,MASK L2P*xx" line. The match is
+// a whole word, case-insensitive; elevation and PRN masks never match.
+bool mask_lists(const char *buf, const char *what);
+
 // --- GNSS watchdog ---------------------------------------------------------------
 
 #define WDOG_COM1_FAILS_FOR_RESET 3       // consecutive minute checks
